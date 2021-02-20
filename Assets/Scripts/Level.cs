@@ -10,8 +10,15 @@ public class Level : MonoBehaviour
     private const float PIPE_MOVE_SPEED = 30f;
     private const float PIPE_DESTROY_X_POSITION = -130f;
     private const float PIPE_SPAWN_X_POSITION = 130f;
+    private const float BIRD_X_POSITION = 0f;
 
+    public static Level GetInstance()
+    {
+        return instance;
+    }
+    private static Level instance;
     private List<Pipe> pipeList;
+    private int pipesPassedCount;
     private int pipesSpawned;
     private float pipeSpawnTimer;
     private float pipeSpawnTimerMax;
@@ -27,6 +34,7 @@ public class Level : MonoBehaviour
 
     private void Awake()
     {
+        instance = this;
         pipeList = new List<Pipe>();
         pipeSpawnTimerMax = 1f;
         SetDifficulty(Difficulty.Easy);
@@ -64,7 +72,14 @@ public class Level : MonoBehaviour
     {
         for (int i = 0; i < pipeList.Count; i++){
             Pipe pipe = pipeList[i];
+            bool isToTheRightOfBird = pipe.GetXPosition() > BIRD_X_POSITION;
             pipe.Move();
+
+            if (isToTheRightOfBird && pipe.GetXPosition() <= BIRD_X_POSITION && pipe.IsBottom())
+            {
+            // Pipe passed bird
+                pipesPassedCount++;
+            }
 
             if (pipe.GetXPosition() <= PIPE_DESTROY_X_POSITION)
             {
@@ -145,8 +160,18 @@ public class Level : MonoBehaviour
         pipeBodyBoxCollider.size = new Vector2(PIPE_WIDTH, height);
         pipeBodyBoxCollider.offset = new Vector2(0f, height * 0.5f);
 
-        Pipe pipe = new Pipe(pipeHead, pipeBody);
+        Pipe pipe = new Pipe(pipeHead, pipeBody, createBottom);
         pipeList.Add(pipe);
+    }
+
+    public int GetPipesSpawned()
+    {
+        return pipesSpawned;
+    }
+
+    public int GetPipesPassedCount()
+    {
+        return pipesPassedCount;
     }
 
 
@@ -155,11 +180,13 @@ public class Level : MonoBehaviour
     {
         private Transform pipeHeadTransform;
         private Transform pipeBodyTransform;
+        private bool isBottom;
 
-        public Pipe(Transform pipeHeadTransform, Transform pipeBodyTransform)
+        public Pipe(Transform pipeHeadTransform, Transform pipeBodyTransform, bool isBottom)
         {
             this.pipeHeadTransform = pipeHeadTransform;
             this.pipeBodyTransform = pipeBodyTransform;
+            this.isBottom = isBottom;
         }
 
         public void Move()
@@ -177,6 +204,11 @@ public class Level : MonoBehaviour
         {
             Destroy(pipeHeadTransform.gameObject);
             Destroy(pipeBodyTransform.gameObject);
+        }
+
+        public bool IsBottom()
+        {
+            return isBottom;
         }
     }
 }
