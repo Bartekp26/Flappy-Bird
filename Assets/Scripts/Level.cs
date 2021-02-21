@@ -55,7 +55,6 @@ public class Level : MonoBehaviour
     private void Bird_OnDied(object sender, System.EventArgs e)
     {
         state = State.BirdDead;
-        UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
     }
 
     private void Update()
