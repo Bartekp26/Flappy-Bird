@@ -15,17 +15,41 @@ public class Bird : MonoBehaviour
     }
 
     public event EventHandler OnDied;
+    public event EventHandler OnStartedPlaying;
+
+    private State state;
+    private enum State {
+        WaitingToStart,
+        Playing,
+        Dead,
+    }
 
     private void Awake()
     {
         instance = this;
         rigidbody = GetComponent<Rigidbody2D>();
+        rigidbody.bodyType = RigidbodyType2D.Static;
+        state = State.WaitingToStart;
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)){
-            Jump();
+        switch (state){
+            case State.WaitingToStart:
+                if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)){
+                    state = State.Playing;
+                    rigidbody.bodyType = RigidbodyType2D.Dynamic;
+                    Jump();
+                    if (OnStartedPlaying != null) OnStartedPlaying(this, EventArgs.Empty);
+                }
+                break;
+            case State.Playing:
+                if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)){
+                    Jump();
+                }
+                break;
+            case State.Dead:
+                break;
         }
     }
 

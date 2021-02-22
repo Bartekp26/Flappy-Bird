@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using CodeMonkey.Utils;
+
 public class GameOverWindow : MonoBehaviour
 {
     private Text scoreText;
@@ -9,14 +11,13 @@ public class GameOverWindow : MonoBehaviour
     private void Awake()
     {
         scoreText = transform.Find("scoreText").GetComponent<Text>();
-        transform.Find("retryButton").GetComponent<Button>();
-        UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
-        Hide();
+        transform.Find("retryButton").GetComponent<Button_UI>().ClickFunc = () => { UnityEngine.SceneManagement.SceneManager.LoadScene("gameScene"); };
     }
 
     private void Start()
     {
         Bird.GetInstance().OnDied += Bird_OnDied;
+        Hide();
     }
 
     private void Bird_OnDied(object sender, System.EventArgs e)
