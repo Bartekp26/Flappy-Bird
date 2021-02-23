@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,7 +12,7 @@ public class GameOverWindow : MonoBehaviour
     private void Awake()
     {
         scoreText = transform.Find("scoreText").GetComponent<Text>();
-        transform.Find("retryButton").GetComponent<Button_UI>().ClickFunc = () => { UnityEngine.SceneManagement.SceneManager.LoadScene("gameScene"); };
+        transform.Find("retryButton").GetComponent<Button_UI>().ClickFunc = () => { Loader.Load(Loader.Scene.GameScene); };
     }
 
     private void Start()
