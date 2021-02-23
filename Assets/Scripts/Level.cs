@@ -100,6 +100,7 @@ public class Level : MonoBehaviour
             {
             // Pipe passed bird
                 pipesPassedCount++;
+                SoundManager.PlaySound(SoundManager.Sound.Score);
             }
 
             if (pipe.GetXPosition() <= PIPE_DESTROY_X_POSITION)
