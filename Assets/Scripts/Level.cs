@@ -10,6 +10,8 @@ public class Level : MonoBehaviour
     private const float PIPE_MOVE_SPEED = 30f;
     private const float PIPE_DESTROY_X_POSITION = -130f;
     private const float PIPE_SPAWN_X_POSITION = 130f;
+    private const float GROUND_DESTROY_X_POSITION = -250f;
+    private const float GROUND_SPAWN_X_POSITION = 250f;
     private const float BIRD_X_POSITION = 0f;
 
     public static Level GetInstance()
@@ -17,6 +19,8 @@ public class Level : MonoBehaviour
         return instance;
     }
     private static Level instance;
+
+    private List<Transform> groundList;
     private List<Pipe> pipeList;
     private int pipesPassedCount;
     private int pipesSpawned;
@@ -43,6 +47,7 @@ public class Level : MonoBehaviour
     {
         instance = this;
         pipeList = new List<Pipe>();
+        SpawnInitialGround();
         pipeSpawnTimerMax = 1f;
         SetDifficulty(Difficulty.Easy);
         state = State.WaitingToStart;
@@ -69,6 +74,41 @@ public class Level : MonoBehaviour
         if (state == State.Playing){
             HandlePipeMovement();
             HandlePipeSpawning();
+            HandleGround();
+        }
+    }
+
+    private void SpawnInitialGround() {
+        groundList = new List<Transform>();
+        Transform groundTransform;
+        float groundY = -47.5f;
+        float groundWidth = 192f;
+        groundTransform = Instantiate(GameAssets.getInstance().pfGround, new Vector3(0, groundY, 0), Quaternion.identity);
+        groundList.Add(groundTransform);
+        groundTransform = Instantiate(GameAssets.getInstance().pfGround, new Vector3(groundWidth, groundY, 0), Quaternion.identity);
+        groundList.Add(groundTransform);
+        groundTransform = Instantiate(GameAssets.getInstance().pfGround, new Vector3(groundWidth * 2f, groundY, 0), Quaternion.identity);
+        groundList.Add(groundTransform);
+    }
+
+    private void HandleGround() {
+        foreach (Transform groundTransform in groundList) {
+            groundTransform.position += new Vector3(-1, 0, 0) * PIPE_MOVE_SPEED * Time.deltaTime;
+
+            if (groundTransform.position.x < GROUND_DESTROY_X_POSITION) {
+                // Ground passed the left side, relocate on right side
+                // Find right most X position
+                float rightMostXPosition = -100f;
+                for (int i = 0; i < groundList.Count; i++) {
+                    if (groundList[i].position.x > rightMostXPosition) {
+                        rightMostXPosition = groundList[i].position.x;
+                    }
+                }
+
+                // Place Ground on the right most position
+                float groundWidth = 192f;
+                groundTransform.position = new Vector3(rightMostXPosition + groundWidth, groundTransform.position.y, groundTransform.position.z);
+            }
         }
     }
 
